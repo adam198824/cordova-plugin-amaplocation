@@ -1,5 +1,5 @@
 {
-  "name": "cordova-plugin-amaplocation",
+  "name": "com.kit.cordova.amaplocation",
   "version": "1.0.0",
   "description": "使用高德Android定位SDK进行定位，以解决webapp中定位不准的问题",
   "main": "index.js",
