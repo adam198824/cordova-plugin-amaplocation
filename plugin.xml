@@ -51,7 +51,7 @@
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <!--依据Android的包名和SHA1在高德官网申请的key-->
-            <meta-data android:name="com.amap.api.v2.apikey" android:value="您申请的高德地图android key" />
+            <meta-data android:name="com.amap.api.v2.apikey" android:value="53f14b858e02c373dbfdc1aa9efa1adf" />
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
