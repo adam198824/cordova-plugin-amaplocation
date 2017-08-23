@@ -74,8 +74,8 @@
                 <string>location</string>
             </array>
         </config-file>
-        <config-file target="*/*-Info.plist" parent="NSLocationAlwaysUsageDescription">
-            <string>为了确保您可以正确使用本应用，请选择允许</string>
+        <config-file target="*/*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
+            <string>用于位置显示和获取附近的商家</string>
         </config-file>
         <source-file src="src/ios/LocationPlugin.m" />
     </platform>
