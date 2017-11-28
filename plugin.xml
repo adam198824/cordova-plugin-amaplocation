@@ -74,9 +74,9 @@
                 <string>location</string>
             </array>
         </config-file>
-        <config-file target="*/*-Info.plist" parent="NSLocationAlwaysUsageDescription">
+         <edit-config file="*-Info.plist" mode="merge" target="NSLocationWhenInUseUsageDescription">
             <string>用于位置显示和获取附近的商家</string>
-        </config-file>
+        </edit-config>
         <source-file src="src/ios/LocationPlugin.m" />
     </platform>
 </plugin>
