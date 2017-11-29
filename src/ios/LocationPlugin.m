@@ -36,27 +36,15 @@ static NSString* const ROAD_KEY        = @"road";
 
 - (void)getlocation:(CDVInvokedUrlCommand*)command{
     callbackId = command.callbackId;
-    if(curLocationManager == nil){
-        curLocationManager = [[CLLocationManager alloc] init];
-        curLocationManager.distanceFilter = kCLDistanceFilterNone;
-        curLocationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;//精度最佳
-        curLocationManager.delegate = self;
-        if([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined && [[[UIDevice currentDevice] systemVersion ] floatValue] >= 8.0){
-            [curLocationManager requestAlwaysAuthorization];
-        }
-    }
-    
-    if(![CLLocationManager locationServicesEnabled]){
+    [self initLocationManager];
+
+     if ([CLLocationManager authorizationStatus] ==kCLAuthorizationStatusDenied) {
+         NSLog(@"定位不能用");
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"定位服务未打开"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        return;
+         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
-    
-    
-    
     [curLocationManager startUpdatingLocation];
 }
-
 /**
  *定位成功，回调此方法
  */
@@ -108,12 +96,17 @@ static NSString* const ROAD_KEY        = @"road";
 }
 
 - (void)initLocationManager{
+    
     locationManager = [[CLLocationManager alloc] init];
     locationManager.delegate = self;
     locationManager.distanceFilter = kCLLocationAccuracyHundredMeters; //更新距离
     locationManager.desiredAccuracy = kCLLocationAccuracyBest;//精度最佳
-    if([[[UIDevice currentDevice] systemVersion ] floatValue] >= 8.0){
+    if ([locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
+        NSLog(@"requestAlwaysAuthorization");
         [locationManager requestAlwaysAuthorization];
+//       仅在前台需要定位
+        [locationManager requestWhenInUseAuthorization];
+
     }
 }
 
