@@ -16,14 +16,12 @@ static NSString* const ROAD_KEY        = @"road";
 
 @interface LocationPlugin : CDVPlugin <CLLocationManagerDelegate>{
     // Member variables go here.
-    CLLocationManager* locationManager;
-    CLLocationManager* curLocationManager;
     BOOL isStart;
     NSString* callbackId;
     int maxLength;
     int interval;
 }
-
+@property (nonatomic,strong) CLLocationManager* curLocationManager;
 - (void)getlocation:(CDVInvokedUrlCommand*)command;
 
 - (CLLocationCoordinate2D)transformFromWGSToGCJ:(CLLocationCoordinate2D) wgLoc;
@@ -36,14 +34,18 @@ static NSString* const ROAD_KEY        = @"road";
 
 - (void)getlocation:(CDVInvokedUrlCommand*)command{
     callbackId = command.callbackId;
-    [self initLocationManager];
+   _curLocationManager = [self curLocationManager];
 
      if ([CLLocationManager authorizationStatus] ==kCLAuthorizationStatusDenied) {
          NSLog(@"定位不能用");
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"定位服务未打开"];
-         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+         return;
     }
-    [curLocationManager startUpdatingLocation];
+    [_curLocationManager startUpdatingLocation];
+}
+-(void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading{
+    NSLog(@"%@",newHeading);
 }
 /**
  *定位成功，回调此方法
@@ -52,7 +54,7 @@ static NSString* const ROAD_KEY        = @"road";
     CLLocation* location = (CLLocation*)[locations lastObject];
     CLLocationCoordinate2D gcjLocation = [self transformFromWGSToGCJ: location.coordinate];
     NSMutableDictionary *locationInfoDic = [[NSMutableDictionary alloc]init];
-    if(manager == curLocationManager){
+    if(manager == _curLocationManager){
         // 根据经纬度反编
         CLGeocoder *geocoder = [[CLGeocoder alloc]init];
         [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray<CLPlacemark *> *_Nullable placemarks, NSError * _Nullable error) {
@@ -95,19 +97,20 @@ static NSString* const ROAD_KEY        = @"road";
     return;
 }
 
-- (void)initLocationManager{
-    
-    locationManager = [[CLLocationManager alloc] init];
-    locationManager.delegate = self;
-    locationManager.distanceFilter = kCLLocationAccuracyHundredMeters; //更新距离
-    locationManager.desiredAccuracy = kCLLocationAccuracyBest;//精度最佳
-    if ([locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
-        NSLog(@"requestAlwaysAuthorization");
-        [locationManager requestAlwaysAuthorization];
-//       仅在前台需要定位
-        [locationManager requestWhenInUseAuthorization];
-
+- (CLLocationManager *)curLocationManager{
+    if (!_curLocationManager) {
+        _curLocationManager = [[CLLocationManager alloc] init];
+        _curLocationManager.delegate = self;
+        _curLocationManager.distanceFilter = kCLLocationAccuracyHundredMeters; //更新距离
+        _curLocationManager.desiredAccuracy = kCLLocationAccuracyBest;//精度最佳
+        if ([_curLocationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
+            NSLog(@"requestAlwaysAuthorization");
+            [_curLocationManager requestAlwaysAuthorization];
+            //       仅在前台需要定位
+            //        [_curLocationManager requestWhenInUseAuthorization];
+        }
     }
+    return _curLocationManager;
 }
 
 
